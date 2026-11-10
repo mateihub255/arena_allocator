@@ -1,19 +1,19 @@
-CC = clang
-CFLAGS = -Wall -Wextra -Werror -std=c11 -pedantic -g -fsanitize=address,undefined
+CC = gcc
+CFLAGS = -Wall -Wextra -Werror -std=c11 -pedantic -g -fsanitize=address,undefined -Iinclude
 
 .PHONY: all test clean
 
 all: test
 
-test: arena.o test_main.o
-	$(CC) $(CFLAGS) -o test arena.o main.o
+test: src/allocator.o tests/main.o
+	$(CC) $(CFLAGS) -o test src/allocator.o tests/main.o
 	./test
 
-arena.o: arena.c arena.h
-	$(CC) $(CFLAGS) -c arena.c
+src/allocator.o: src/allocator.c include/allocator.h
+	$(CC) $(CFLAGS) -c src/allocator.c -o src/allocator.o
 
-main.o: main.c arena.h
-	$(CC) $(CFLAGS) -c main.c
+tests/main.o: tests/main.c include/allocator.h
+	$(CC) $(CFLAGS) -c tests/main.c -o tests/main.o
 
 clean:
-	rm -rf test *.o *.dSYM
+	rm -rf test src/*.o tests/*.o *.dSYM

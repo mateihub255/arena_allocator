@@ -1,0 +1,11 @@
+*.o
+*.obj
+
+test
+*.exe
+*.out
+
+*.dSYM/
+
+.DS_Store
+Thumbs.db

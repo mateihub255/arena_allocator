@@ -19,7 +19,7 @@ typedef struct ArenaTemp{
 /**
  * @brief Allocate a block of contiguous memory from the system.
  */
-arena_t arena_create(arena_t *arena);
+arena_t arena_create(size_t capacity);
 
 /**
  * @brief Free the block of memory when done with it.
