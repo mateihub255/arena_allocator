@@ -20,6 +20,7 @@ void arena_free(arena_t *arena) {
     arena->offset = 0;
     arena->capacity = 0;
     free(arena->buffer);
+    arena->buffer = NULL;
 }
 
 // void *arena_alloc_align(arena_t *arena, size_t size, size_t alignment) {
