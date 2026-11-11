@@ -23,21 +23,39 @@ void arena_free(arena_t *arena) {
     arena->buffer = NULL;
 }
 
-// void *arena_alloc_align(arena_t *arena, size_t size, size_t alignment) {
+void *arena_alloc_align(arena_t *arena, size_t size, size_t alignment) {
+    if (arena == NULL){
+            return NULL;
+        }
+        size_t aligned_offset = (arena->offset + (alignment - 1)) & ~(alignment - 1);
+        if (aligned_offset + size > arena->capacity) {
+            return NULL;
+        } else {
+            void *return_ptr = arena->buffer + aligned_offset;
+            arena->offset = aligned_offset + size;
+            return return_ptr;
+        }
+}
 
-// }
-
-// void *arena_alloc(arena_t *arena, size_t size) {
-
-// }
+void *arena_alloc(arena_t *arena, size_t size) {
+    if (arena == NULL){
+        return NULL;
+    }
+    return arena_alloc_align(arena, size, sizeof(void *));
+}
 
 // void *arena_alloc_zero(arena_t *arena, size_t size) {
-
+//     if (arena == NULL){
+//         return NULL;
+//     }
 // }
 
-// void arena_reset(arena_t *arena) {
-
-// }
+void arena_reset(arena_t *arena) {
+    if (arena == NULL) {
+        return;
+    }
+    arena->offset = 0;
+}
 
 // arena_temp_t arena_temp_begin(arena_t *arena) {
 
