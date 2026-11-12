@@ -44,11 +44,18 @@ void *arena_alloc(arena_t *arena, size_t size) {
     return arena_alloc_align(arena, size, sizeof(void *));
 }
 
-// void *arena_alloc_zero(arena_t *arena, size_t size) {
-//     if (arena == NULL){
-//         return NULL;
-//     }
-// }
+void *arena_alloc_zero(arena_t *arena, size_t size) {
+    if (arena == NULL){
+        return NULL;
+    }
+    void *zero_arena_start = arena_alloc(arena, size);
+    if (zero_arena_start == NULL) {
+        return NULL;
+    }
+    memset(zero_arena_start, 0, size);
+
+    return zero_arena_start;
+}
 
 void arena_reset(arena_t *arena) {
     if (arena == NULL) {

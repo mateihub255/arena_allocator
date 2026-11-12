@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -std=c11 -pedantic -g -fsanitize=address,undefined -Iinclude
+CFLAGS = -Wall -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter -std=c11 -pedantic -g -fsanitize=address,undefined -Iinclude
 
 .PHONY: all test clean
 

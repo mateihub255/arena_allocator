@@ -76,6 +76,40 @@ static void test_alignment_overflow(arena_t *arena) {
     assert(arena->offset == 1);
 }
 
+static void test_alloc_zero(arena_t *arena) {
+    arena_reset(arena);
+
+    memset(arena->buffer, 0xFE, arena->capacity);
+
+    uint8_t *one_byte = arena_alloc_align(arena, 1, sizeof(uint8_t));   
+    assert(one_byte != NULL);
+    *one_byte = 0x1A;
+
+    size_t count = 10;
+    int *zeros = arena_alloc_zero(arena, count * sizeof(int));
+    assert(zeros != NULL);
+    assert(((uintptr_t)zeros % 8) == 0);
+
+    for (size_t i = 0; i < count; i++) {
+        assert(zeros[i] == 0);
+    }
+
+    assert(*one_byte == 0x1A);
+    assert(arena->buffer[arena->offset] == 0xFE);
+
+    size_t offset_before_alloc = arena->offset;
+    void *empty = arena_alloc_zero(arena, 0);
+    assert(empty == NULL || arena->offset == offset_before_alloc);
+
+    void *overflow = arena_alloc_zero(arena, (SIZE_MAX) / sizeof(int) + 1);
+    assert(overflow == NULL);
+    assert(arena->offset == offset_before_alloc);
+
+    void *too_big = arena_alloc_zero(arena, 2000);
+    assert(too_big == NULL);
+    assert(arena->offset == offset_before_alloc);
+}
+
 int main(void) {
 
     printf("--- Testing Arena Creation & Free ---\n");
@@ -91,6 +125,9 @@ int main(void) {
 
     printf("--- Testing Alignment Overflow ---\n");
     test_alignment_overflow(&arena);
+
+    printf("--- Testing Zero-ed Out Arena ---\n");
+    test_alloc_zero(&arena);
 
     arena_free(&arena);
 
