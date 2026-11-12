@@ -64,10 +64,19 @@ void arena_reset(arena_t *arena) {
     arena->offset = 0;
 }
 
-// arena_temp_t arena_temp_begin(arena_t *arena) {
+arena_temp_t arena_temp_begin(arena_t *arena) {
+    if (arena == NULL) {
+        return (arena_temp_t){0};
+    }
+    arena_temp_t snapshot;
+    snapshot.arena = arena;
+    snapshot.saved_offset = arena->offset;
+    return snapshot;
+}
 
-// }
-
-// void arena_temp_end(arena_temp_t *temp) {
-
-// }
+void arena_temp_end(arena_temp_t *temp) {
+    if (temp == NULL) {
+        return;
+    }
+    temp->arena->offset = temp->saved_offset;
+}

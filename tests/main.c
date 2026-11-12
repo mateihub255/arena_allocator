@@ -110,24 +110,38 @@ static void test_alloc_zero(arena_t *arena) {
     assert(arena->offset == offset_before_alloc);
 }
 
+static void test_temp_begin_and_end(arena_t *arena) {
+    arena_reset(arena);
+    uint32_t *long_lifespan = arena_alloc_align(arena, 64 * sizeof(uint32_t), sizeof(uint32_t));
+    
+    assert(arena->buffer != NULL);
+    assert(arena->capacity == 1024);
+    assert(arena->offset == 256);
+
+    arena_temp_t temp_arena = arena_temp_begin(arena);
+    uint32_t *short_lifespan = arena_alloc_align(temp_arena.arena, 128 * sizeof(uint32_t), sizeof(uint32_t));
+
+    assert(temp_arena.arena->buffer != NULL);
+    assert(temp_arena.arena->offset == 768);
+
+    arena_temp_end(&temp_arena);
+
+    assert(temp_arena.arena->buffer != NULL);
+    assert(temp_arena.arena->offset == 256);
+}
+
 int main(void) {
 
-    printf("--- Testing Arena Creation & Free ---\n");
+    printf("--- Test Arena Functions ---\n");
     test_creation_and_free();
 
     arena_t arena = arena_create(1024);
 
-    printf("--- Testing Alloc Functions ---\n");
     test_alloc_align(&arena);
-    
-    printf("--- Testing Reset ---\n");
     test_reset(&arena);
-
-    printf("--- Testing Alignment Overflow ---\n");
     test_alignment_overflow(&arena);
-
-    printf("--- Testing Zero-ed Out Arena ---\n");
     test_alloc_zero(&arena);
+    test_temp_begin_and_end(&arena);
 
     arena_free(&arena);
 
