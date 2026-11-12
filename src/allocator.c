@@ -75,7 +75,7 @@ arena_temp_t arena_temp_begin(arena_t *arena) {
 }
 
 void arena_temp_end(arena_temp_t *temp) {
-    if (temp == NULL) {
+    if (temp == NULL || temp->arena == NULL) {
         return;
     }
     temp->arena->offset = temp->saved_offset;

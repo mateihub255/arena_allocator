@@ -114,20 +114,31 @@ static void test_temp_begin_and_end(arena_t *arena) {
     arena_reset(arena);
     uint32_t *long_lifespan = arena_alloc_align(arena, 64 * sizeof(uint32_t), sizeof(uint32_t));
     
-    assert(arena->buffer != NULL);
+    assert(long_lifespan != NULL);
     assert(arena->capacity == 1024);
+    long_lifespan[0] = 0xDEADBEEF;
+    long_lifespan[63] = 0xC0DEBABE;
     assert(arena->offset == 256);
 
     arena_temp_t temp_arena = arena_temp_begin(arena);
-    uint32_t *short_lifespan = arena_alloc_align(temp_arena.arena, 128 * sizeof(uint32_t), sizeof(uint32_t));
+    uint32_t *short_lifespan = arena_alloc_align(arena, 128 * sizeof(uint32_t), sizeof(uint32_t));
 
-    assert(temp_arena.arena->buffer != NULL);
-    assert(temp_arena.arena->offset == 768);
+    assert(short_lifespan != NULL);
+    short_lifespan[0] = 0x11111111;
+    assert(arena->offset == 768);
 
     arena_temp_end(&temp_arena);
 
-    assert(temp_arena.arena->buffer != NULL);
-    assert(temp_arena.arena->offset == 256);
+    assert(arena->offset == 256);
+    assert(long_lifespan[0] == 0xDEADBEEF);
+    assert(long_lifespan[63] = 0xC0DEBABE);
+
+    uint32_t *reused_space = arena_alloc_align(arena, 64 * sizeof(uint32_t), sizeof(uint32_t));
+    assert(reused_space == short_lifespan);
+
+    arena_temp_t null_temp = arena_temp_begin(NULL);
+    arena_temp_end(&null_temp);
+    arena_temp_end(NULL);
 }
 
 int main(void) {
