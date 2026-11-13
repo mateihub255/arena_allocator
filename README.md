@@ -1,5 +1,5 @@
 # Arena Allocator
-This is my implementation of an arena allocator for C.
+This is my implementation of an arena allocator in C.
 
 ## Prerequisites
 
